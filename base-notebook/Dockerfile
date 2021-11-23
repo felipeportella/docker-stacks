@@ -3,7 +3,7 @@
 
 # Ubuntu 20.04 (focal)
 # https://hub.docker.com/_/ubuntu/?tab=tags&name=focal
-ARG ROOT_CONTAINER=ubuntu:focal
+ARG ROOT_CONTAINER=ubuntu:16.04
 
 FROM $ROOT_CONTAINER
 
@@ -23,7 +23,6 @@ USER root
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update --yes && \
     apt-get install --yes --no-install-recommends \
-    tini \
     wget \
     ca-certificates \
     sudo \
@@ -33,6 +32,11 @@ RUN apt-get update --yes && \
     apt-get clean && rm -rf /var/lib/apt/lists/* && \
     echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
     locale-gen
+
+#install tini manually as not available in apt for Ubuntu 16.04
+ENV TINI_VERSION v0.19.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /usr/bin/tini
+RUN chmod +x /usr/bin/tini
 
 # Configure environment
 ENV CONDA_DIR=/opt/conda \
